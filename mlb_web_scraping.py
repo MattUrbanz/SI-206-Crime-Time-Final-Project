@@ -5,7 +5,14 @@ from bs4 import BeautifulSoup
 import requests
 
 #Create the MLB Databases
-def create_mlb_tables(cur,conn):
+DATABASE_NAME = 'crime_time_database.db'
+DATABASE_PATH = os.path.join(os.path.dirname(__file__), DATABASE_NAME)
+def connect_database():
+    conn = sqlite3.connect(DATABASE_PATH)
+    cur = conn.cursor()
+    return conn, cur
+
+def create_mlb_tables(cur,conn, team):
     '''
     Arguments
         cur: databse cursor 
@@ -15,38 +22,33 @@ def create_mlb_tables(cur,conn):
     Notes:
         Creates table for storing MLB regular season data
     '''
-    for team in teams:
-        cur.execute('DROP TABLE IF EXISTS ?', (team,))
-        cur.execute('''
-            CREATE TABLE ? (season INTEGER, wins INTEGER, losses INTEGER)
-                    ''', (team,))
-    conn.commit()
-    conn.close()
 
-def insert_mlb_data(season, win_amount, loss_amount, cur, conn, team):
+    
+    cur.execute(f'''
+        CREATE TABLE IF NOT EXISTS {team} (season INTEGER, wins INTEGER, losses INTEGER)
+                ''')
+    conn.commit()
+
+def insert_mlb_data(year, win_amount, loss_amount, cur, conn, team):
     '''
     Arguments
         cur: databse cursor 
         conn: database connection
         season: Integer
         win_amount: Integer
-        loss_amoun: Integer
+        loss_amount: Integer
 
     Returns
         None
     Notes:
         Inserts record for each regular season past 2000 into database
     '''
-    cur.execute('''
-        INSERT INTO ? (season, wins, losses) VALUES ?, ?, ?
-                ''', (team, season, win_amount, loss_amount))
+    cur.execute(f'''
+        INSERT INTO {team} (season, wins, losses) VALUES ({year}, {win_amount}, {loss_amount})
+                ''')
     conn.commit()
-    conn.close()
 
-
-teams = {'DET' : 'Detroit-Tigers', 'TEX' : 'Texas-Rangers', 'BOS' : 'Boston-Red-Sox', 'LAD' : 'Los-Angeles-Dodgers', 'PHI' : 'Philladelphia-Phillies'}
-r = requests.get('https://www.baseball-reference.com/teams/DET')
-soup = BeautifulSoup(r.content, 'html.parser')
+teams = {'DET' : 'Detroit_Tigers', 'TEX' : 'Texas_Rangers', 'BOS' : 'Boston_Red_Sox', 'LAD' : 'Los_Angeles_Dodgers', 'PHI' : 'Philladelphia_Phillies'}
 team_abbs = teams.keys()
 
 for team_abb in team_abbs:
@@ -58,7 +60,7 @@ for team_abb in team_abbs:
     
     
     table_headers = soup.find_all('th', attrs = {'data-stat': 'year_ID', 'class': 'left'})
-    print(teams[team_abb])
+    
 
     for header in table_headers:
         a_tag = header.find('a')
@@ -72,8 +74,11 @@ for team_abb in team_abbs:
                         wins = int(win_tag.text)
                         loss_tag = row.find('td', attrs = {'data-stat': 'L'})
                         losses = int(loss_tag.text)
-                        print('Year: ', year, ' Wins: ', wins, ' Losses: ', losses)
-                        #insert_mlb_data(year, wins, losses, cur, conn)
+                        conn, cur = connect_database()
+                        create_mlb_tables(cur, conn, teams[team_abb])
+                        insert_mlb_data(year, wins, losses, cur, conn, teams[team_abb])
+
+
                 
 
                 
