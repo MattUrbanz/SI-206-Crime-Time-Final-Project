@@ -56,18 +56,26 @@ def get_season_record(id, year):
 
     response = requests.get(url, headers=headers, params=querystring)
 
+    if response.status_code != 200:
+        print(f"Failed to fetch data for ID {id}, Year {year}: {response.status_code}")
+        return None
+
     response_data = response.json()
-    # Check if the response contains 'items' and retrieve the first item (overall record)
+
+    # Check if the response contains 'items' and retrieve the first item's 'summary'
     if "items" in response_data and len(response_data["items"]) > 0:
-        overall_record = response_data["items"][0]["summary"]
-    else:
-        return "No data available for the given year and team ID."
-    
-    wl_lst = overall_record.split("-")
-    wins = int(wl_lst[0])
-    losses = int(wl_lst[1])
-    wl = [wins, losses]
-    return wl
+        overall_record = response_data["items"][0].get("summary", "")
+        if "-" in overall_record:
+            wl_lst = overall_record.split("-")
+            try:
+                wins = int(wl_lst[0])
+                losses = int(wl_lst[1])
+                return [wins, losses]
+            except ValueError:
+                print(f"Error parsing wins/losses for ID {id}, Year {year}: {overall_record}")
+                return None
+    print(f"No data available for ID {id}, Year {year}.")
+    return None
     
 def create_nfl_tables(cur, conn):
     '''
@@ -106,8 +114,10 @@ def insert_nfl_data(cur, conn):
         index += 1
         for year in range(2000, 2023):
             data = get_season_record(id, year)
+            if data is None:
+                print(f"Skipping insertion for {team_list[index]} - Year {year} due to missing data.")
+                continue
             team = team_list[index]
-    
             cur.execute(f'''
                 INSERT INTO {team} (season, wins, losses) VALUES (?, ?, ?)
                 ''', (year, data[0], data[1]))
