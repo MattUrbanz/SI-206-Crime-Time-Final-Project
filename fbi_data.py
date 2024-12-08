@@ -56,17 +56,35 @@ def get_hate_crime_count(state, year):
     
 # put data into tables 
 def populate_state_tables(state_abbrs, start_year, end_year, cur, conn):
+    record_count = 0  # Counter to track the number of records inserted
+
     for state in state_abbrs:
+        if record_count >= 25:
+            break  # Stop if we've already inserted 25 records
+
         table_name = f"{state}_hate_crime_counts"
         for year in range(start_year, end_year + 1):
+            if record_count >= 25:
+                break  # Stop if we've already inserted 25 records
+            
             count = get_hate_crime_count(state, year)
             cur.execute(f'''
                 INSERT INTO {table_name} (year, hate_crime_count)
                 VALUES (?, ?)
             ''', (year, count))
+            record_count += 1  # Increment the record counter
+
             print(f"Inserted data into {table_name}: {year}, {count}")
+            
+            if record_count >= 25:
+                print("Reached the 25-record limit for this run.")
+                break  # Exit if the limit is reached
+
         conn.commit()
 
+
+
+        
 def main():
     # Database setup
     conn, cur = connect_database()
