@@ -42,8 +42,8 @@ def get_team_data(id,startyear):
 
     team_name = df['TEAM_NAME'].values[0]
     season = df['YEAR'].values[0]
-    wins = df['WINS'].values[0]
-    losses = df['LOSSES'].values[0]
+    wins = int(df['WINS'].values[0])
+    losses = int(df['LOSSES'].values[0])
 
     return [team_name, season, wins, losses]
 
