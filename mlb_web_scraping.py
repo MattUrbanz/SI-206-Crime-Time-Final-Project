@@ -77,6 +77,7 @@ for team_abb in team_abbs:
                         conn, cur = connect_database()
                         create_mlb_tables(cur, conn, teams[team_abb])
                         insert_mlb_data(year, wins, losses, cur, conn, teams[team_abb])
+                        conn.close()
 
 
                 

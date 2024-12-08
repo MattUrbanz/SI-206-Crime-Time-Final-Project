@@ -3,6 +3,8 @@ from nba_api.stats.static import teams
 import sqlite3
 import os
 
+#Run "pip install nba_api" command
+
 celtics_id = 1610612738
 mavericks_id = 1610612742
 clippers_id = 1610612746
@@ -45,6 +47,10 @@ def get_team_data(id,startyear):
     wins = int(df['WINS'].values[0])
     losses = int(df['LOSSES'].values[0])
 
+    team_stats = teamyearbyyearstats.TeamYearByYearStats(
+    team_id=id, 
+    timeout=10  )
+
     return [team_name, season, wins, losses]
 
 def create_nba_tables(cur, conn):
@@ -68,28 +74,19 @@ def create_nba_tables(cur, conn):
     conn.commit()
 
 def insert_nba_data(cur, conn):
-    '''
-    Arguments
-        cur: database cursor
-        conn: database connection
-    
-    Returns
-        none
-
-    Notes
-        Adds data for relevant NBA teams into their respective databases
-    '''
-
     index = -1
     for id in id_list:
         index += 1
         for year in range(2000, 2023):
-            data = get_team_data(id, year)
-            team = team_list[index]
-    
-            cur.execute(f'''
-                INSERT INTO {team} (season, wins, losses) VALUES (?, ?, ?)
-                ''', (data[1], data[2], data[3]))
+            try:
+                data = get_team_data(id, year)
+                team = team_list[index]
+                
+                cur.execute(f'''
+                    INSERT INTO {team} (season, wins, losses) VALUES (?, ?, ?)
+                    ''', (data[1], data[2], data[3]))
+            except Exception as e:
+                print(f"Failed to insert data for team {team}, year {year}: {e}")
     conn.commit()
 
 cnc = connect_database()

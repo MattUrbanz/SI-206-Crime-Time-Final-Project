@@ -2,6 +2,9 @@ import json
 import os
 import sqlite3
 import http.client
+import requests
+
+
 
 apikey = "4mUliNsMpBI4C0LiWapMSFLJhGVdXSVbVocFdU7Z"
 
@@ -20,9 +23,13 @@ id_list = [cowboys_id, lions_id, rams_id, patriots_id, eagles_id, chargers_id]
 team_list = ["Cowboys", "Lions", "Rams", "Patriots", "Eagles", "Chargers"]
 
 def connect_database():
-    conn = sqlite3.connect(DATABASE_PATH)
+    conn = sqlite3.connect(DATABASE_PATH, timeout=10)  # Increase timeout to prevent locking
     cur = conn.cursor()
     return cur, conn
+
+def close_database(conn):
+    conn.commit()
+    conn.close()
 
 def get_season_record(id, year):
     '''
@@ -38,25 +45,18 @@ def get_season_record(id, year):
     str_id = str(id)
     str_year = str(year)
 
-    # Initialize the connection
-    conn = http.client.HTTPSConnection("nfl-api-data.p.rapidapi.com")
+    url = "https://nfl-api-data.p.rapidapi.com/nfl-team-record"
 
-    # Set up headers
+    querystring = {"id":f"{str_id}","year":f"{str_year}"}
+
     headers = {
-        'x-rapidapi-key': apikey,
-        'x-rapidapi-host': "nfl-api-data.p.rapidapi.com"
+	"x-rapidapi-key": apikey,
+	"x-rapidapi-host": "nfl-api-data.p.rapidapi.com"
     }
 
-    # Make the API request
-    conn.request("GET", f"/nfl-team-record?id={str_id}&year={str_year}", headers=headers)
+    response = requests.get(url, headers=headers, params=querystring)
 
-    # Get the response and read the data
-    res = conn.getresponse()
-    data = res.read()
-
-    # Decode the response data into a dictionary
-    response_data = json.loads(data.decode("utf-8"))
-
+    response_data = response.json()
     # Check if the response contains 'items' and retrieve the first item (overall record)
     if "items" in response_data and len(response_data["items"]) > 0:
         overall_record = response_data["items"][0]["summary"]
@@ -116,3 +116,4 @@ def insert_nfl_data(cur, conn):
 cnc = connect_database()
 create_nfl_tables(cnc[0], cnc[1])
 insert_nfl_data(cnc[0], cnc[1])
+close_database(cnc[1])
