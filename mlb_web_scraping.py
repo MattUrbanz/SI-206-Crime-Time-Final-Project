@@ -48,7 +48,7 @@ def insert_mlb_data(year, win_amount, loss_amount, cur, conn, team):
                 ''')
     conn.commit()
 
-teams = {'DET' : 'Detroit_Tigers', 'TEX' : 'Texas_Rangers', 'BOS' : 'Boston_Red_Sox', 'LAD' : 'Los_Angeles_Dodgers', 'PHI' : 'Philladelphia_Phillies'}
+teams = {'DET' : 'Detroit_Tigers', 'TEX' : 'Texas_Rangers', 'BOS' : 'Boston_Red_Sox', 'LAD' : 'Los_Angeles_Dodgers', 'PHI' : 'Philadelphia_Phillies'}
 team_abbs = teams.keys()
 
 for team_abb in team_abbs:
