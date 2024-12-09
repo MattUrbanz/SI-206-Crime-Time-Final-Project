@@ -56,35 +56,49 @@ def get_hate_crime_count(state, year):
     
 # put data into tables 
 def populate_state_tables(state_abbrs, start_year, end_year, cur, conn):
-    record_count = 0  # Counter to track the number of records inserted
+    max_records_per_run = 25  # Limit across all tables
+    total_record_count = 0  # Counter for all insertions in this run
 
     for state in state_abbrs:
-        if record_count >= 25:
-            break  # Stop if we've already inserted 25 records
-
         table_name = f"{state}_hate_crime_counts"
+
         for year in range(start_year, end_year + 1):
-            if record_count >= 25:
-                break  # Stop if we've already inserted 25 records
-            
-            count = get_hate_crime_count(state, year)
+            if total_record_count >= max_records_per_run:
+                print("Reached the 25-record limit for this run across all tables.")
+                conn.commit()
+                return  # Stop once the global limit is reached
+
+            # Check if the record already exists for the given year
             cur.execute(f'''
-                INSERT INTO {table_name} (year, hate_crime_count)
-                VALUES (?, ?)
-            ''', (year, count))
-            record_count += 1  # Increment the record counter
+                SELECT 1 FROM {table_name} WHERE year = ?
+            ''', (year,))
+            if cur.fetchone():
+                print(f"Data for {state} in {year} already exists. Skipping...")
+                continue  # Skip existing records
 
-            print(f"Inserted data into {table_name}: {year}, {count}")
-            
-            if record_count >= 25:
-                print("Reached the 25-record limit for this run.")
-                break  # Exit if the limit is reached
+            # Fetch hate crime count for the year
+            count = get_hate_crime_count(state, year)
+            if count is not None:  # Ensure we have valid data
+                cur.execute(f'''
+                    INSERT INTO {table_name} (year, hate_crime_count)
+                    VALUES (?, ?)
+                ''', (year, count))
+                total_record_count += 1  # Increment the global counter
+                print(f"Inserted data into {table_name}: {year}, {count}")
 
-        conn.commit()
+            if total_record_count >= max_records_per_run:
+                print("Reached the 25-record limit for this run across all tables.")
+                conn.commit()
+                return  # Stop once the global limit is reached
+
+    conn.commit()  # Commit any remaining changes
+    print("Data population completed without exceeding the limit.")
 
 
 
-        
+
+
+
 def main():
     # Database setup
     conn, cur = connect_database()
