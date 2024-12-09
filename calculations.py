@@ -2,7 +2,7 @@ import sqlite3
 import matplotlib.pyplot as plt
 
 # Connect to the database
-conn = sqlite3.connect('crime_time_database.db')
+conn = sqlite3.connect('final_crime_time_database.db')
 cur = conn.cursor()
 
 # 1. Calculate state_average_crime_count and create a bar graph

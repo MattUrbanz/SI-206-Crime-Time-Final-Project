@@ -9,11 +9,11 @@ cowboys_id = 6
 lions_id = 8
 patriots_id = 17
 eagles_id = 21
-steelers_id = 23
+#steelers_id = 23
 chargers_id = 24
 
 
-DATABASE_NAME = "crime_time_database.db"
+DATABASE_NAME = "final_crime_time_database.db"
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), DATABASE_NAME)
 
 

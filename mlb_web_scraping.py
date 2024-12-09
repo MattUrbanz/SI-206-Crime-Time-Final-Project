@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import requests
 
 #Create the MLB Databases
-DATABASE_NAME = 'crime_time_database.db'
+DATABASE_NAME = 'final_crime_time_database.db'
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), DATABASE_NAME)
 def connect_database():
     conn = sqlite3.connect(DATABASE_PATH)

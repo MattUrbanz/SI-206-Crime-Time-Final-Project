@@ -6,7 +6,7 @@ import os
 
 API_BASE_URL = 'https://api.usa.gov/crime/fbi/cde/hate-crime/state/'
 API_KEY = '1MriSHUQ3jGzF9vvb3pLRqqSinNoZ6jIElx984Ee'  
-DATABASE_NAME = "crime_time_database.db"
+DATABASE_NAME = "final_crime_time_database.db"
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), DATABASE_NAME)
 
 #connecting to sqlite database 
