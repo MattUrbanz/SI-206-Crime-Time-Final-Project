@@ -6,7 +6,7 @@ import requests
 import http.client
 
 
-apikey = "34bf091696msh2d673e86a83d24cp1632f8jsnf9eb51390314"
+apikey = "457e4ce643mshb56c4fe7d7bcc15p1b06adjsn4aed0dbc49d2"
 
 
 cowboys_id = 6
@@ -62,14 +62,11 @@ def get_season_record(id, year):
 
     response = requests.get(url, headers=headers, params=querystring)
     response_data = response.json()
-
-
+        
     overall_record = "0-0"
-
 
     for item in response_data.get('items', []):
         overall_record = item['summary']
-
 
     wl_lst = overall_record.split("-")
     wins = int(wl_lst[0])
@@ -123,7 +120,6 @@ def insert_nfl_data(cur, conn):
                 INSERT INTO {team} (season, wins, losses) VALUES (?, ?, ?)
                 ''', (year, data[0], data[1]))
     conn.commit()
-
 
 cnc = connect_database()
 create_nfl_tables(cnc[0], cnc[1])
