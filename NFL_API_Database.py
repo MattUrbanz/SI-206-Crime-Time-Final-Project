@@ -13,7 +13,7 @@ steelers_id = 23
 chargers_id = 24
 
 
-DATABASE_NAME = "crime_tim_database.db"
+DATABASE_NAME = "crime_time_database.db"
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), DATABASE_NAME)
 
 
