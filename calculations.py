@@ -81,5 +81,54 @@ plt.legend(fontsize=12)
 plt.tight_layout()
 plt.show()
 
+
+# 1. Calculate state_nfl_win_percentage and create a bar graph
+# Query to calculate the win percentage for each state (MI, TX, MA, PA, CA)
+query_nfl_win_percentage = """
+SELECT
+    'MI' AS state, 
+    SUM(Lions.wins) * 1.0 / SUM(Lions.wins + Lions.losses) AS nfl_win_percentage
+FROM Lions
+UNION
+SELECT
+    'TX', 
+    SUM(Cowboys.wins) * 1.0 / SUM(Cowboys.wins + Cowboys.losses)
+FROM Cowboys
+UNION
+SELECT
+    'MA', 
+    SUM(Patriots.wins) * 1.0 / SUM(Patriots.wins + Patriots.losses)
+FROM Patriots
+UNION
+SELECT
+    'PA', 
+    SUM(Eagles.wins) * 1.0 / SUM(Eagles.wins + Eagles.losses)
+FROM Eagles
+UNION
+SELECT
+    'CA', 
+    SUM(Chargers.wins) * 1.0 / SUM(Chargers.wins + Chargers.losses)
+FROM Chargers;
+"""
+cur.execute(query_nfl_win_percentage)
+results_nfl_win_percentage = cur.fetchall()
+
+# Process data for the bar graph
+states = [row[0] for row in results_nfl_win_percentage]
+win_percentages = [row[1] for row in results_nfl_win_percentage]
+
+# Create bar graph
+plt.figure(figsize=(10, 6))
+plt.bar(states, win_percentages, color='lightgreen', edgecolor='black')
+plt.title('NFL Win Percentages by State (2000-2024)', fontsize=16)
+plt.xlabel('State', fontsize=14)
+plt.ylabel('NFL Win Percentage', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.ylim(0, 1)  # Since percentages range from 0 to 1
+plt.grid(axis='y', linestyle='--', alpha=0.7)
+plt.tight_layout()
+plt.show()
+
 # Close the database connection
 conn.close()
