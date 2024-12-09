@@ -6,8 +6,7 @@ import requests
 import http.client
 
 
-apikey = "34bf091696msh2d673e86a83d24cp1632f8jsnf9eb51390314"
-
+apikey = "457e4ce643mshb56c4fe7d7bcc15p1b06adjsn4aed0dbc49d2"
 
 cowboys_id = 6
 lions_id = 8
@@ -43,33 +42,18 @@ def get_season_record(id, year):
         None
     '''
 
-
     str_id = str(id)
     str_year = str(year)
 
 
-    url = "https://nfl-api-data.p.rapidapi.com/nfl-team-record"
-
-
-    querystring = {"id":f"{str_id}","year":f"{str_year}"}
-
-
-    headers = {
-        "x-rapidapi-key": apikey,
-        "x-rapidapi-host": "nfl-api-data.p.rapidapi.com"
-    }
-
-
-    response = requests.get(url, headers=headers, params=querystring)
-    response_data = response.json()
-
-
-    overall_record = "0-0"
-
-
-    for item in response_data.get('items', []):
-        overall_record = item['summary']
-
+    url = f"https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/{str_year}/types/2/teams/{str_id}/record"
+    response = requests.get(url)
+    data = response.json()
+    items = data.get("items", [])
+    if items:
+        summary = items[0].get("summary")
+        if summary:
+            overall_record = summary
 
     wl_lst = overall_record.split("-")
     wins = int(wl_lst[0])
@@ -123,7 +107,6 @@ def insert_nfl_data(cur, conn):
                 INSERT INTO {team} (season, wins, losses) VALUES (?, ?, ?)
                 ''', (year, data[0], data[1]))
     conn.commit()
-
 
 cnc = connect_database()
 create_nfl_tables(cnc[0], cnc[1])
