@@ -2,7 +2,7 @@ import sqlite3
 import os
 
 # Define the database name and path
-DATABASE_NAME = "crime_time_database.db"
+DATABASE_NAME = "crime_tim_database.db"
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), DATABASE_NAME)
 
 # Create the connection and cursor objects

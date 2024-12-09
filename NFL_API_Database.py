@@ -5,24 +5,20 @@ from bs4 import BeautifulSoup
 import requests
 import http.client
 
-
-apikey = "457e4ce643mshb56c4fe7d7bcc15p1b06adjsn4aed0dbc49d2"
-
 cowboys_id = 6
 lions_id = 8
-rams_id = 14
 patriots_id = 17
 eagles_id = 21
 steelers_id = 23
 chargers_id = 24
 
 
-DATABASE_NAME = "crime_time_database.db"
+DATABASE_NAME = "crime_tim_database.db"
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), DATABASE_NAME)
 
 
-id_list = [cowboys_id, lions_id, rams_id, patriots_id, eagles_id, chargers_id]
-team_list = ["Cowboys", "Lions", "Rams", "Patriots", "Eagles", "Chargers"]
+id_list = [cowboys_id, lions_id, patriots_id, eagles_id, chargers_id]
+team_list = ["Cowboys", "Lions", "Patriots", "Eagles", "Chargers"]
 
 
 def connect_database():
@@ -75,14 +71,11 @@ def create_nfl_tables(cur, conn):
         Creates tables for storing NFL regular season data
     '''
 
-
     for team in team_list:
-        cur.execute(f'DROP TABLE IF EXISTS {team}')
         cur.execute(f'''
-            CREATE TABLE {team} (season INTEGER, wins INTEGER, losses INTEGER)
+            CREATE TABLE IF NOT EXISTS {team} (season INTEGER, wins INTEGER, losses INTEGER, key INTEGER)
                     ''')
     conn.commit()
-
 
 def insert_nfl_data(cur, conn):
     '''
@@ -96,17 +89,22 @@ def insert_nfl_data(cur, conn):
         Philadelphia Eagles, and the Los Angeles Chargers. These databases include each teams win and loss counts for each season from
         the 2000 season up until the NFL's most recently concluded season, 2023.
     '''
-    index = -1
-    for id in id_list:
-        index += 1
-        for year in range(2000, 2023):
-            data = get_season_record(id, year)
-            team = team_list[index]
-   
-            cur.execute(f'''
-                INSERT INTO {team} (season, wins, losses) VALUES (?, ?, ?)
-                ''', (year, data[0], data[1]))
-    conn.commit()
+    index = 0
+
+    for index in range(0,5):
+        query = f"SELECT COUNT(*) FROM {team_list[index]};"
+        cur.execute(query)
+        result = cur.fetchone()
+        if result[0] == 0:
+            for year in range(2000, 2025):
+                data = get_season_record(id_list[index], year)
+                team = team_list[index]
+
+                cur.execute(f'''
+                    INSERT INTO {team} (season, wins, losses, key) VALUES (?, ?, ?, ?)
+                    ''', (year, data[0], data[1], 2))
+            conn.commit()
+            return
 
 cnc = connect_database()
 create_nfl_tables(cnc[0], cnc[1])
