@@ -130,5 +130,56 @@ plt.grid(axis='y', linestyle='--', alpha=0.7)
 plt.tight_layout()
 plt.show()
 
+
+query_cowboys_win_percentage_per_year = """
+SELECT season, 
+       SUM(wins) * 1.0 / (SUM(wins) + SUM(losses)) AS cowboys_win_percentage
+FROM Cowboys
+WHERE season BETWEEN 2000 AND 2023
+GROUP BY season;
+"""
+cur.execute(query_cowboys_win_percentage_per_year)
+cowboys_win_percentage_per_year = cur.fetchall()
+
+# 2. Fetch Crime Data for Texas (TX) from 2000-2023
+query_tx_crime_data = """
+SELECT year, hate_crime_count
+FROM TX_hate_crime_counts
+WHERE year BETWEEN 2000 AND 2022;
+"""
+cur.execute(query_tx_crime_data)
+tx_crime_data = cur.fetchall()
+
+# Process the data: Create lists of win percentages and crime counts for each year
+years = [row[0] for row in tx_crime_data]
+crime_counts = [row[1] for row in tx_crime_data]
+
+# Now, for each year in the crime data, we need to get the corresponding Cowboys' win percentage
+win_percentages = []
+for year in years:
+    # Find the Cowboys' win percentage for the corresponding year
+    for row in cowboys_win_percentage_per_year:
+        if row[0] == year:
+            win_percentages.append(row[1])
+            break
+print(len(win_percentages))
+print(len(crime_counts))
+
+# 3. Create a graph where each dot represents a different year
+plt.figure(figsize=(10, 6))
+plt.scatter(crime_counts, win_percentages, color='blue', label='Data Points', alpha=0.6)
+plt.title('TX Crime Count vs. Cowboys Win Percentage (2000-2023)', fontsize=16)
+plt.xlabel('Crime Count in Texas', fontsize=14)
+plt.ylabel('Cowboys Win Percentage', fontsize=14)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+plt.grid(True)
+plt.legend(fontsize=12)
+plt.tight_layout()
+plt.show()
+
+
+
+
 # Close the database connection
 conn.close()
