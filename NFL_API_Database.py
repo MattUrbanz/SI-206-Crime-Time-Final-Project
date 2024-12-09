@@ -1,9 +1,12 @@
 import json
 import os
 import sqlite3
+from bs4 import BeautifulSoup
+import requests
 import http.client
 
-apikey = "4mUliNsMpBI4C0LiWapMSFLJhGVdXSVbVocFdU7Z"
+
+apikey = "457e4ce643mshb56c4fe7d7bcc15p1b06adjsn4aed0dbc49d2"
 
 cowboys_id = 6
 lions_id = 8
@@ -13,16 +16,20 @@ eagles_id = 21
 steelers_id = 23
 chargers_id = 24
 
+
 DATABASE_NAME = "crime_time_database.db"
 DATABASE_PATH = os.path.join(os.path.dirname(__file__), DATABASE_NAME)
 
+
 id_list = [cowboys_id, lions_id, rams_id, patriots_id, eagles_id, chargers_id]
 team_list = ["Cowboys", "Lions", "Rams", "Patriots", "Eagles", "Chargers"]
+
 
 def connect_database():
     conn = sqlite3.connect(DATABASE_PATH)
     cur = conn.cursor()
     return cur, conn
+
 
 def get_season_record(id, year):
     '''
@@ -38,56 +45,44 @@ def get_season_record(id, year):
     str_id = str(id)
     str_year = str(year)
 
-    # Initialize the connection
-    conn = http.client.HTTPSConnection("nfl-api-data.p.rapidapi.com")
 
-    # Set up headers
-    headers = {
-        'x-rapidapi-key': apikey,
-        'x-rapidapi-host': "nfl-api-data.p.rapidapi.com"
-    }
+    url = f"https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/{str_year}/types/2/teams/{str_id}/record"
+    response = requests.get(url)
+    data = response.json()
+    items = data.get("items", [])
+    if items:
+        summary = items[0].get("summary")
+        if summary:
+            overall_record = summary
 
-    # Make the API request
-    conn.request("GET", f"/nfl-team-record?id={str_id}&year={str_year}", headers=headers)
-
-    # Get the response and read the data
-    res = conn.getresponse()
-    data = res.read()
-
-    # Decode the response data into a dictionary
-    response_data = json.loads(data.decode("utf-8"))
-
-    # Check if the response contains 'items' and retrieve the first item (overall record)
-    if "items" in response_data and len(response_data["items"]) > 0:
-        overall_record = response_data["items"][0]["summary"]
-    else:
-        return "No data available for the given year and team ID."
-    
     wl_lst = overall_record.split("-")
     wins = int(wl_lst[0])
     losses = int(wl_lst[1])
     wl = [wins, losses]
     return wl
-    
+   
 def create_nfl_tables(cur, conn):
     '''
     Arguments
         cur: database cursor
         conn: database connection
-    
+   
     Returns
         none
+
 
     Notes
         Creates tables for storing NFL regular season data
     '''
 
+
     for team in team_list:
+        cur.execute(f'DROP TABLE IF EXISTS {team}')
         cur.execute(f'''
-                    CREATE TABLE IF NOT EXISTS {team}
-                    (season INTEGER NOT NULL, wins INTEGER NOT NULL, losses INTEGER NOT NULL)
+            CREATE TABLE {team} (season INTEGER, wins INTEGER, losses INTEGER)
                     ''')
     conn.commit()
+
 
 def insert_nfl_data(cur, conn):
     '''
@@ -97,8 +92,8 @@ def insert_nfl_data(cur, conn):
     Returns:
         None
     Notes
-        Inserts data into databases for NFL teams including the Dallas Cowboys, Detroit Lions, Los Angeles Rams, New England Patriots, 
-        Philadelphia Eagles, and the Los Angeles Chargers. These databases include each teams win and loss counts for each season from 
+        Inserts data into databases for NFL teams including the Dallas Cowboys, Detroit Lions, Los Angeles Rams, New England Patriots,
+        Philadelphia Eagles, and the Los Angeles Chargers. These databases include each teams win and loss counts for each season from
         the 2000 season up until the NFL's most recently concluded season, 2023.
     '''
     index = -1
@@ -107,7 +102,7 @@ def insert_nfl_data(cur, conn):
         for year in range(2000, 2023):
             data = get_season_record(id, year)
             team = team_list[index]
-    
+   
             cur.execute(f'''
                 INSERT INTO {team} (season, wins, losses) VALUES (?, ?, ?)
                 ''', (year, data[0], data[1]))

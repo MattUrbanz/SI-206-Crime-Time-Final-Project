@@ -56,16 +56,48 @@ def get_hate_crime_count(state, year):
     
 # put data into tables 
 def populate_state_tables(state_abbrs, start_year, end_year, cur, conn):
+    max_records_per_run = 25  # Limit across all tables
+    total_record_count = 0  # Counter for all insertions in this run
+
     for state in state_abbrs:
         table_name = f"{state}_hate_crime_counts"
+
         for year in range(start_year, end_year + 1):
-            count = get_hate_crime_count(state, year)
+            if total_record_count >= max_records_per_run:
+                print("Reached the 25-record limit for this run across all tables.")
+                conn.commit()
+                return  # Stop once the global limit is reached
+
+            # Check if the record already exists for the given year
             cur.execute(f'''
-                INSERT INTO {table_name} (year, hate_crime_count)
-                VALUES (?, ?)
-            ''', (year, count))
-            print(f"Inserted data into {table_name}: {year}, {count}")
-        conn.commit()
+                SELECT 1 FROM {table_name} WHERE year = ?
+            ''', (year,))
+            if cur.fetchone():
+                print(f"Data for {state} in {year} already exists. Skipping...")
+                continue  # Skip existing records
+
+            # Fetch hate crime count for the year
+            count = get_hate_crime_count(state, year)
+            if count is not None:  # Ensure we have valid data
+                cur.execute(f'''
+                    INSERT INTO {table_name} (year, hate_crime_count)
+                    VALUES (?, ?)
+                ''', (year, count))
+                total_record_count += 1  # Increment the global counter
+                print(f"Inserted data into {table_name}: {year}, {count}")
+
+            if total_record_count >= max_records_per_run:
+                print("Reached the 25-record limit for this run across all tables.")
+                conn.commit()
+                return  # Stop once the global limit is reached
+
+    conn.commit()  # Commit any remaining changes
+    print("Data population completed without exceeding the limit.")
+
+
+
+
+
 
 def main():
     # Database setup

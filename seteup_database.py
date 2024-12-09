@@ -9,15 +9,28 @@ DATABASE_PATH = os.path.join(os.path.dirname(__file__), DATABASE_NAME)
 conn = sqlite3.connect(DATABASE_PATH)
 cur = conn.cursor()
 
-# Optional: Create a test table (can be removed or modified later)
+
+# Create integer key table if it doesn't exist
 cur.execute('''
-    CREATE TABLE IF NOT EXISTS test_table (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    CREATE TABLE IF NOT EXISTS SportKey (
+        id INTEGER PRIMARY KEY,
+        sport TEXT NOT NULL
     )
 ''')
-conn.commit()
+
+# Insert records into the SportKey table
+cur.execute('''
+    SELECT 1 FROM SportKey WHERE id = ?
+            ''', (1,))
+if not cur.fetchone():
+    cur.execute('''
+        INSERT INTO SportKey (id, sport) VALUES (?, ?)
+    ''', (1, 'Baseball'))
+
+    cur.execute('''
+        INSERT INTO SportKey (id, sport) VALUES (?, ?)
+    ''', (2, 'Football'))
+    conn.commit()
 
 print(f"Database '{DATABASE_NAME}' created successfully in the current directory.")
 
