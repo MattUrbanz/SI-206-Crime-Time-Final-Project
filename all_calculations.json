@@ -1,0 +1,166 @@
+{
+    "average_crime_counts_by_state": [
+        {
+            "State": "CA",
+            "Average Crime Count": 1570.0
+        },
+        {
+            "State": "MA",
+            "Average Crime Count": 470.3333333333333
+        },
+        {
+            "State": "MI",
+            "Average Crime Count": 518.4583333333334
+        },
+        {
+            "State": "PA",
+            "Average Crime Count": 124.29166666666667
+        },
+        {
+            "State": "TX",
+            "Average Crime Count": 348.2916666666667
+        }
+    ],
+    "mi_crime_loss_ratios": [
+        {
+            "Year": 2000,
+            "Crime to Loss Ratio": 5.9879518072289155
+        },
+        {
+            "Year": 2001,
+            "Crime to Loss Ratio": 5.322916666666667
+        },
+        {
+            "Year": 2002,
+            "Crime to Loss Ratio": 4.566037735849057
+        },
+        {
+            "Year": 2003,
+            "Crime to Loss Ratio": 3.991596638655462
+        },
+        {
+            "Year": 2004,
+            "Crime to Loss Ratio": 7.133333333333334
+        },
+        {
+            "Year": 2005,
+            "Crime to Loss Ratio": 7.791208791208791
+        },
+        {
+            "Year": 2006,
+            "Crime to Loss Ratio": 10.447761194029852
+        },
+        {
+            "Year": 2007,
+            "Crime to Loss Ratio": 10.054054054054054
+        },
+        {
+            "Year": 2008,
+            "Crime to Loss Ratio": 7.7727272727272725
+        },
+        {
+            "Year": 2009,
+            "Crime to Loss Ratio": 5.324675324675325
+        },
+        {
+            "Year": 2010,
+            "Crime to Loss Ratio": 4.592592592592593
+        },
+        {
+            "Year": 2011,
+            "Crime to Loss Ratio": 6.746268656716418
+        },
+        {
+            "Year": 2012,
+            "Crime to Loss Ratio": 9.95945945945946
+        },
+        {
+            "Year": 2013,
+            "Crime to Loss Ratio": 5.869565217391305
+        },
+        {
+            "Year": 2014,
+            "Crime to Loss Ratio": 5.041666666666667
+        },
+        {
+            "Year": 2015,
+            "Crime to Loss Ratio": 4.287356321839081
+        },
+        {
+            "Year": 2016,
+            "Crime to Loss Ratio": 6.226666666666667
+        },
+        {
+            "Year": 2017,
+            "Crime to Loss Ratio": 5.23469387755102
+        },
+        {
+            "Year": 2018,
+            "Crime to Loss Ratio": 5.122448979591836
+        },
+        {
+            "Year": 2019,
+            "Crime to Loss Ratio": 4.0964912280701755
+        },
+        {
+            "Year": 2020,
+            "Crime to Loss Ratio": 14.714285714285714
+        },
+        {
+            "Year": 2021,
+            "Crime to Loss Ratio": 5.670588235294118
+        },
+        {
+            "Year": 2022,
+            "Crime to Loss Ratio": 5.052083333333333
+        },
+        {
+            "Year": 2023,
+            "Crime to Loss Ratio": 5.404761904761905
+        }
+    ],
+    "nfl_win_percentages_by_state": [
+        {
+            "State": "CA",
+            "Win Percentage": 0.5025
+        },
+        {
+            "State": "MA",
+            "Win Percentage": 0.6725
+        },
+        {
+            "State": "MI",
+            "Win Percentage": 0.38944723618090454
+        },
+        {
+            "State": "PA",
+            "Win Percentage": 0.6005025125628141
+        },
+        {
+            "State": "TX",
+            "Win Percentage": 0.5388471177944862
+        }
+    ],
+    "tx_crime_vs_cowboys_win": [
+        {
+            "Crime Count": 341,
+            "Cowboys Win Percentage": 0.5025
+        },
+        {
+            "Crime Count": 543,
+            "Cowboys Win Percentage": 0.6725
+        },
+        {
+            "Crime Count": 426,
+            "Cowboys Win Percentage": 0.38944723618090454
+        },
+        {
+            "Crime Count": 320,
+            "Cowboys Win Percentage": 0.6005025125628141
+        },
+        {
+            "Crime Count": 364,
+            "Cowboys Win Percentage": 0.5388471177944862
+        }
+    ]
+}

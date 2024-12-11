@@ -1,5 +1,13 @@
 import sqlite3
 import matplotlib.pyplot as plt
+import json
+
+calculations = {}
+
+def write_data_to_json(filename, data):
+    with open(filename, mode='w', encoding='utf-8') as file:
+        json.dump(data, file, indent=4)
+    print(f"Data successfully written to {filename}")
 
 # Connect to the database
 conn = sqlite3.connect('final_crime_time_database.db')
@@ -35,6 +43,10 @@ results_avg_crime = cur.fetchall()
 states = [row[0] for row in results_avg_crime]
 avg_crimes = [row[1] for row in results_avg_crime]
 
+calculations['average_crime_counts_by_state'] = [
+    {"State": row[0], "Average Crime Count": row[1]} for row in results_avg_crime
+]
+
 # Create bar graph
 plt.figure(figsize=(10, 6))
 plt.bar(states, avg_crimes, color='skyblue', edgecolor='black')
@@ -68,6 +80,10 @@ results_crime_loss_ratio = cur.fetchall()
 years = [row[0] for row in results_crime_loss_ratio]
 ratios = [row[1] for row in results_crime_loss_ratio]
 
+calculations['mi_crime_loss_ratios'] = [
+    {"Year": row[0], "Crime to Loss Ratio": row[1]} for row in results_crime_loss_ratio
+]
+
 # Create line graph
 plt.figure(figsize=(12, 7))
 plt.plot(years, ratios, marker='o', color='red', label='MI Crime/Loss Ratio')
@@ -82,7 +98,7 @@ plt.tight_layout()
 plt.show()
 
 
-# 1. Calculate state_nfl_win_percentage and create a bar graph
+# 3. Calculate state_nfl_win_percentage and create a bar graph
 # Query to calculate the win percentage for each state (MI, TX, MA, PA, CA)
 query_nfl_win_percentage = """
 SELECT
@@ -116,6 +132,9 @@ results_nfl_win_percentage = cur.fetchall()
 # Process data for the bar graph
 states = [row[0] for row in results_nfl_win_percentage]
 win_percentages = [row[1] for row in results_nfl_win_percentage]
+calculations['nfl_win_percentages_by_state'] = [
+    {"State": row[0], "Win Percentage": row[1]} for row in results_nfl_win_percentage
+]
 
 # Create bar graph
 plt.figure(figsize=(10, 6))
@@ -141,7 +160,7 @@ GROUP BY season;
 cur.execute(query_cowboys_win_percentage_per_year)
 cowboys_win_percentage_per_year = cur.fetchall()
 
-# 2. Fetch Crime Data for Texas (TX) from 2000-2023
+# Fetch Crime Data for Texas (TX) from 2000-2023
 query_tx_crime_data = """
 SELECT year, hate_crime_count
 FROM TX_hate_crime_counts
@@ -149,6 +168,11 @@ WHERE year BETWEEN 2000 AND 2022;
 """
 cur.execute(query_tx_crime_data)
 tx_crime_data = cur.fetchall()
+scatter_data = list(zip([row[1] for row in tx_crime_data], win_percentages))
+calculations['tx_crime_vs_cowboys_win'] = [
+    {"Crime Count": crime, "Cowboys Win Percentage": win} 
+    for crime, win in scatter_data
+]
 
 # Process the data: Create lists of win percentages and crime counts for each year
 years = [row[0] for row in tx_crime_data]
@@ -162,10 +186,10 @@ for year in years:
         if row[0] == year:
             win_percentages.append(row[1])
             break
-print(len(win_percentages))
-print(len(crime_counts))
+#print(len(win_percentages))
+#print(len(crime_counts))
 
-# 3. Create a graph where each dot represents a different year
+# 4. Create a graph where each dot represents a different year
 plt.figure(figsize=(10, 6))
 plt.scatter(crime_counts, win_percentages, color='blue', label='Data Points', alpha=0.6)
 plt.title('TX Crime Count vs. Cowboys Win Percentage (2000-2023)', fontsize=16)
@@ -179,7 +203,7 @@ plt.tight_layout()
 plt.show()
 
 
-
+write_data_to_json('all_calculations.json', calculations)
 
 # Close the database connection
 conn.close()
