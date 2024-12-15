@@ -5,9 +5,22 @@ import json
 calculations = {}
 
 def write_data_to_json(filename, data):
+    '''
+    Writes the given data to a JSON file with the specified filename.
+Parameters:
+filename (str): The name of the file where the data will be written. This file will be created or overwritten. data (dict or list): The data to be written to the JSON file. This can be a dictionary, list, or any JSON-serializable object.
+What the code does:
+- Opens the specified file in write mode ('w') with UTF-8 encoding. If the file does not exist, it will be created.
+- Uses ison.dump() to serialize the data and write it to the file. The data will be formatted with an indentation of 4 spaces for readability.
+- Prints a success message indicating that the data has been successfully written to the specified file.
+Returns:
+None
+    '''
     with open(filename, mode='w', encoding='utf-8') as file:
         json.dump(data, file, indent=4)
     print(f"Data successfully written to {filename}")
+
+
 
 # Connect to the database
 conn = sqlite3.connect('final_crime_time_database.db')

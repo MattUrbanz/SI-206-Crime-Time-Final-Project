@@ -22,6 +22,17 @@ team_list = ["Cowboys", "Lions", "Patriots", "Eagles", "Chargers"]
 
 
 def connect_database():
+    '''
+    Establishes a connection to the SOLite database and returns the connection and cursor objects.
+What the code does:
+- Connects to the SQLite database specified by the DATABASE _PATH variable.
+- Creates a cursor object, which is used to execute SQL commands on the connected database.
+- Returns both the connection object and the cursor object to be used for database operations.
+Returns:
+tuple: A tuple containing two objects:
+- conn (sqlite3.Connection): The connection object used to manage the database connection and commit transactions.
+- cur (sqlite.Cursor): The cursor object used to execute SQL commands on the database.
+    '''
     conn = sqlite3.connect(DATABASE_PATH)
     cur = conn.cursor()
     return cur, conn
@@ -30,12 +41,10 @@ def connect_database():
 def get_season_record(id, year):
     '''
     Arguments:
-        id: id number for football team whose record is desired to be extracted
-        year: year of season which record is desired
+    id: id number for football team whose record is desired to be extracted year: year of season which record is desired
     Returns:
-        list of two integers, with the first integer being wins and second being losses
-    Notes:
-        None
+    list of two integers, with the first integer being wins and second being losses Notes:
+    None
     '''
 
     str_id = str(id)
